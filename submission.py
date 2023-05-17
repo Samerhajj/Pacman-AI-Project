@@ -37,7 +37,7 @@ class ReflexAgent(Agent):
     and returns a number, where higher numbers are better.
     """
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        return scoreEvaluationFunction(successorGameState)
+        return betterEvaluationFunction(successorGameState)
 
 
 #     ********* Evaluation functions *********
