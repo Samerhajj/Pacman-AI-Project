@@ -301,7 +301,49 @@ class RandomExpectimaxAgent(MultiAgentSearchAgent):
     """
 
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+        PACMAN = 0
+        def max_agent(state, depth):
+            if state.isWin() or state.isLose():
+                return state.getScore()
+            actions = state.getLegalActions(PACMAN)
+            best_score = float("-inf")
+            score = best_score
+            best_action = Directions.STOP
+            for action in actions:
+                score = min_agent(state.generateSuccessor(PACMAN, action), depth, 1)
+                if score > best_score:
+                    best_score = score
+                    best_action = action
+            if depth == 0:
+                return best_action
+            else:
+                return best_score
+
+        def min_agent(state, depth, ghost):
+            if state.isLose():
+                return state.getScore()
+            next_ghost = ghost + 1
+            if ghost == state.getNumAgents() - 1:
+                # Although I call this variable next_ghost, at this point we are referring to a pacman agent.
+                # I never changed the variable name and now I feel bad. That's why I am writing this guilty comment :(
+                next_ghost = PACMAN
+            actions = state.getLegalActions(ghost)
+            best_score = float("inf")
+            score = best_score
+            for action in actions:
+                prob = 1.0/len(actions)
+                if next_ghost == PACMAN: # We are on the last ghost and it will be Pacman's turn next.
+                    if depth == self.depth - 1:
+                        score = self.evaluationFunction(state.generateSuccessor(ghost, action))
+                        score += prob * score
+                    else:
+                        score = max_agent(state.generateSuccessor(ghost, action), depth + 1)
+                        score += prob * score
+                else:
+                    score = min_agent(state.generateSuccessor(ghost, action), depth, next_ghost)
+                    score += prob * score
+            return score
+        return max_agent(gameState, 0)
         # END_YOUR_CODE
 
 
