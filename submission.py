@@ -68,6 +68,47 @@ def betterEvaluationFunction(gameState):
   The GameState class is defined in pacman.py and you might want to look into that for other helper methods.
   """
 
+    if gameState.isWin():
+        return float("inf")  # Assign a very high positive score for a win
+    elif gameState.isLose():
+        return float("-inf")  # Assign a very low negative score for a loss
+    newPos = gameState.getPacmanPosition()
+    newFood = gameState.getFood()
+    newGhostStates = gameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+
+    """ Manhattan distance to the foods from the game state """
+    foodList = newFood.asList()
+    foodDistance = [0]
+    for pos in foodList:
+        foodDistance.append(util.manhattanDistance(newPos,pos))
+
+    """ Manhattan distance to each ghost from the game state"""
+    ghostPos = []
+    for ghost in newGhostStates:
+        ghostPos.append(ghost.getPosition())
+    ghostDistance = [0]
+    for pos in ghostPos:
+        ghostDistance.append(util.manhattanDistance(newPos,pos))
+
+    numberofPowerPellets = len(gameState.getCapsules())
+
+    score = 0
+    numberOfNoFoods = len(newFood.asList(False))
+    sumScaredTimes = sum(newScaredTimes)
+    sumGhostDistance = sum(ghostDistance)
+    reciprocalfoodDistance = 0
+    if sum(foodDistance) > 0:
+        reciprocalfoodDistance = 1.0 / sum(foodDistance)
+
+    score += gameState.getScore() + reciprocalfoodDistance + numberOfNoFoods
+
+    if sumScaredTimes > 0:
+        score += sumScaredTimes + (-1 * numberofPowerPellets) + (-1 * sumGhostDistance)
+    else:
+        score += sumGhostDistance + numberofPowerPellets
+    return score
+
 #     ********* MultiAgent Search Agents- sections c,d,e,f*********
 
 class MultiAgentSearchAgent(Agent):
